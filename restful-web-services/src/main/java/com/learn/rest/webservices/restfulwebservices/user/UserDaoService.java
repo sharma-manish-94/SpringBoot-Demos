@@ -1,10 +1,12 @@
 package com.learn.rest.webservices.restfulwebservices.user;
 
+import com.learn.rest.webservices.restfulwebservices.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class UserDaoService {
@@ -24,8 +26,14 @@ public class UserDaoService {
     }
 
     public User findUserById(Integer id) {
-        return users.stream().filter(user -> id.equals(user.getId()))
-                .findAny().orElse(null);
+        Optional<User> optionalUser = users.stream().filter(user -> id.equals(user.getId()))
+                .findAny();
+        if(optionalUser.isPresent()) {
+            return optionalUser.get();
+        } else {
+            throw new UserNotFoundException("User Not Found for id: "+ id);
+        }
+
     }
 
     public User createUser(User user) {
