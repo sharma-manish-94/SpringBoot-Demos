@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Component
 public class UserDaoService {
@@ -40,5 +41,10 @@ public class UserDaoService {
         User newUser = new User(++userCount, user.getName(), user.getBirthDate());
         users.add(newUser);
         return newUser;
+    }
+
+    public void deleteById(Integer id) {
+        Predicate<? extends User> predicate = user -> id.equals(user.getId());
+        users.removeIf((Predicate<? super User>) predicate);
     }
 }
