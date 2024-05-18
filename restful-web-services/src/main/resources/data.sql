@@ -1,0 +1,5 @@
+insert into user_details(id, birth_date, name) values (1001, current_date(), 'Manish')
+insert into user_details(id, birth_date, name) values (1002, current_date(), 'Pikku')
+insert into user_details(id, birth_date, name) values (1003, current_date(), 'Golu')
+insert into user_details(id, birth_date, name) values (1004, current_date(), 'Boo')
+insert into user_details(id, birth_date, name) values (1005, current_date(), 'Bhaiya')
