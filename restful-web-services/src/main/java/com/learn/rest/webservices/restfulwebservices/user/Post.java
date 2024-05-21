@@ -3,6 +3,7 @@ package com.learn.rest.webservices.restfulwebservices.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Post {
@@ -11,6 +12,7 @@ public class Post {
     @GeneratedValue
     private Integer id;
 
+    @Size(min = 10)
     private String description;
 
     @JsonIgnore

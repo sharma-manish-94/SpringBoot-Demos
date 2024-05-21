@@ -24,16 +24,53 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 public class UserJpaResource {
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
 
     @Autowired
-    public UserJpaResource(final UserRepository userRepository) {
+    public UserJpaResource(final UserRepository userRepository,
+                           final PostRepository postRepository) {
         this.userRepository = userRepository;
+        this.postRepository = postRepository;
     }
 
     @GetMapping(path = "/jpa/users")
     public List<User> retrieveAllUsers() {
 //        return userDaoService.findAll();
         return userRepository.findAll();
+    }
+
+    @GetMapping(path = "/jpa/users/{id}/posts")
+    public List<Post> retrievePostsForUser(@PathVariable int id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("id: " + id);
+        }
+        return optionalUser.get().getPosts();
+    }
+
+    @GetMapping(path = "/jpa/users/{user_id}/posts/{post_id}")
+    public Post retrievePostForUser(@PathVariable("user_id") int userId, @PathVariable("post_id") int postId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("id: " + userId);
+        }
+        return postRepository.findByIdAndUser_id(postId, userId);
+    }
+
+    @PostMapping(path = "/jpa/users/{id}/posts")
+    public ResponseEntity<Object> createPostForUser(@PathVariable int id, @Valid @RequestBody Post post) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("id: " + id);
+        }
+
+        post.setUser(optionalUser.get());
+        Post savePost = postRepository.save(post);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(savePost.getId()).toUri();
+        MultiValueMap<String, String> headersMap = new HttpHeaders();
+        headersMap.put("location", Collections.singletonList(location.toString()));
+        return new ResponseEntity<>(savePost, headersMap, HttpStatusCode.valueOf(201));
     }
 
     @GetMapping(path = "/jpa/users/{id}")
